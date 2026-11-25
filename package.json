@@ -1,0 +1,10 @@
+{
+  "name": "folio-resume-studio",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "python3 scripts/server.py --port 5173",
+    "build": "node scripts/build.mjs",
+    "preview": "python3 scripts/server.py --port 4173 --built"
+  }
+}

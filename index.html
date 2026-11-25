@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#101411">
+    <meta name="description" content="用对话整理你的经历，实时预览、修改并导出个人简历网站。">
+    <title>Folio · 简历建站</title>
+    <link rel="icon" href="./assets/folio-icon.png" type="image/png">
+    <link rel="stylesheet" href="./src/styles.css">
+  </head>
+  <body>
+    <svg class="icon-sheet" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+      <symbol id="i-folio" viewBox="0 0 24 24"><path d="M5.5 18.5V5.8a1.3 1.3 0 0 1 1.3-1.3h7.4l4.3 4.3v9.7a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1Z"/><path d="M14 4.8v4.5h4.2M9 13h6m-6 3.3h3.8"/></symbol>
+      <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 2.8c.8 5.7 3.5 8.4 9.2 9.2-5.7.8-8.4 3.5-9.2 9.2C11.2 15.5 8.5 12.8 2.8 12 8.5 11.2 11.2 8.5 12 2.8Z"/></symbol>
+      <symbol id="i-template" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="15" rx="2"/><path d="M3 9h18m-11 0v10.5"/></symbol>
+      <symbol id="i-terminal" viewBox="0 0 24 24"><path d="m5 7 5 5-5 5m8 0h6"/></symbol>
+      <symbol id="i-clip" viewBox="0 0 24 24"><path d="m20.1 11.4-7.9 7.9a4.4 4.4 0 0 1-6.2-6.2l9-9a2.9 2.9 0 0 1 4.1 4.1l-9 9a1.4 1.4 0 0 1-2-2l7.9-7.9"/></symbol>
+      <symbol id="i-send" viewBox="0 0 24 24"><path d="m21 3-6.9 18-3.8-7.3L3 9.9 21 3Zm0 0L10.3 13.7"/></symbol>
+      <symbol id="i-chat" viewBox="0 0 24 24"><path d="M20.5 11.5a8 8 0 0 1-8 8h-1l-4 2v-3.2a8 8 0 1 1 13-6.8Z"/><path d="M8.5 11.5h.01m3.99 0h.01m3.99 0h.01" stroke-width="2.5"/></symbol>
+      <symbol id="i-window" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="15" rx="2"/><path d="M3 9h18m-14-2.3h.01m2.7 0h.01"/></symbol>
+      <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v11m-4-4 4 4 4-4M5 15.5v4a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-4"/></symbol>
+      <symbol id="i-shield" viewBox="0 0 24 24"><path d="m12 3 7 3v5c0 4.2-2.5 7.5-7 10-4.5-2.5-7-5.8-7-10V6l7-3Z"/><path d="m9 12 2 2 4-4"/></symbol>
+      <symbol id="i-swatch" viewBox="0 0 24 24"><path d="M12 3.5a8.5 8.5 0 1 0 0 17h1.3a1.7 1.7 0 0 0 1.2-2.9 1.7 1.7 0 0 1 1.2-2.9h1.9c2 0 3-1.2 3-3.1A8.5 8.5 0 0 0 12 3.5Z"/><path d="M7.8 10.4h.01m3-3h.01m3.8.5h.01m2.4 2.9h.01" stroke-width="2.4"/></symbol>
+      <symbol id="i-code" viewBox="0 0 24 24"><path d="m8 7-5 5 5 5m8-10 5 5-5 5m-2.5-13-3 16"/></symbol>
+      <symbol id="i-cap" viewBox="0 0 24 24"><path d="m2.5 9.5 9.5-5 9.5 5-9.5 5-9.5-5Zm4 2.1v5.4c3.2 2.6 7.8 2.6 11 0v-5.4m4-2.1v6"/></symbol>
+      <symbol id="i-monitor" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="12" rx="2"/><path d="M12 16.5V20m-4 0h8"/></symbol>
+      <symbol id="i-mobile" viewBox="0 0 24 24"><rect x="6.5" y="3" width="11" height="18" rx="2"/><path d="M11 17.5h2"/></symbol>
+      <symbol id="i-expand" viewBox="0 0 24 24"><path d="M8 4H4v4m12-4h4v4M4 16v4h4m12-4v4h-4"/></symbol>
+      <symbol id="i-edit" viewBox="0 0 24 24"><path d="M12 5H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-6m-2.3-8.3 3.6 3.6-8.9 8.9-4.1.5.5-4.1 8.9-8.9Z"/></symbol>
+      <symbol id="i-history" viewBox="0 0 24 24"><path d="M3.5 11a8.5 8.5 0 1 1 1.4 5.7M3.5 11V5m0 6h6m2.5-3v4.5l3 1.8"/></symbol>
+      <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+      <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4.5 4.5L19 7"/></symbol>
+      <symbol id="i-settings" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2" fill="var(--header)"/><circle cx="15" cy="12" r="2" fill="var(--header)"/><circle cx="9" cy="18" r="2" fill="var(--header)"/></symbol>
+    </svg>
+    <a class="skip-link" href="#main-content">跳到主要内容</a>
+
+    <header class="site-header">
+      <div class="header-inner">
+        <a class="brand" id="brand-link" href="./" aria-label="Folio 首页">
+          <span class="brand-mark"><svg class="icon" aria-hidden="true"><use href="#i-folio"></use></svg></span>
+          <span class="brand-name">Folio<span>.</span></span>
+          <span class="brand-label">简历建站</span>
+        </a>
+        <nav class="header-actions" id="home-nav" aria-label="网站导航">
+          <a class="nav-link" href="#guide">使用指南</a>
+          <button class="button button-quiet" id="open-drafts" type="button" hidden>我的草稿</button>
+          <button class="button button-quiet model-button" data-model-settings type="button" aria-label="模型设置" title="模型设置">
+            <svg class="icon" aria-hidden="true"><use href="#i-settings"></use></svg><span>模型设置</span>
+          </button>
+          <button class="button button-outline example-button" id="open-example" type="button">
+            <svg class="icon" aria-hidden="true"><use href="#i-template"></use></svg><span>查看示例</span>
+          </button>
+        </nav>
+        <div class="header-actions" id="studio-nav" hidden>
+          <span class="save-status" id="save-status" role="status"></span>
+          <button class="button button-quiet model-button" data-model-settings type="button" aria-label="模型设置" title="模型设置">
+            <svg class="icon" aria-hidden="true"><use href="#i-settings"></use></svg><span>模型设置</span>
+          </button>
+          <button class="button button-primary export-button" id="export-site" type="button" disabled>
+            <svg class="icon" aria-hidden="true"><use href="#i-download"></use></svg><span>导出 HTML</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main id="main-content" tabindex="-1">
+      <div id="home">
+        <section class="hero" aria-labelledby="home-title">
+          <div class="hero-art" aria-hidden="true"></div>
+          <div class="hero-inner">
+            <p class="hero-label"><svg class="icon" aria-hidden="true"><use href="#i-spark"></use></svg>对话式简历生成器</p>
+            <h1 id="home-title">把你的经历，<br><span>写成一个网站。</span></h1>
+            <p class="hero-description">粘贴简历或聊聊你的经历，边预览边修改，生成可独立打开的个人网站。</p>
+
+            <form class="composer hero-composer" id="brief-form">
+              <label for="brief"><svg class="icon" aria-hidden="true"><use href="#i-terminal"></use></svg>描述你的经历</label>
+              <textarea id="brief" rows="3" maxlength="20000" spellcheck="false" placeholder="例如：我叫林雨桐，是一名产品设计师。做过城市出行 App 改版，&#10;擅长 Figma 和用户研究。想做一个简约的个人网站。"></textarea>
+              <div class="composer-actions">
+                <div class="composer-tools">
+                  <input id="brief-file" type="file" accept=".txt,.md,.markdown,text/plain,text/markdown" hidden>
+                  <button class="button button-quiet attachment-button" id="import-brief" type="button">
+                    <svg class="icon" aria-hidden="true"><use href="#i-clip"></use></svg><span>导入文本</span>
+                  </button>
+                  <span class="composer-divider" aria-hidden="true"></span>
+                  <span class="keyboard-hint"><kbd>Enter</kbd> 发送 <span>·</span> <kbd>Shift + Enter</kbd> 换行</span>
+                </div>
+                <button class="button button-primary generate-button" id="generate" type="submit" disabled>
+                  <svg class="icon" aria-hidden="true"><use href="#i-send"></use></svg><span>生成简历网站</span>
+                </button>
+              </div>
+              <p class="form-note" id="file-note" role="status" hidden></p>
+            </form>
+
+            <div class="examples" aria-label="填写示例">
+              <span>试试示例</span>
+              <button class="chip" type="button" data-example="designer" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-swatch"></use></svg>产品设计师</button>
+              <button class="chip" type="button" data-example="engineer" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-code"></use></svg>前端工程师</button>
+              <button class="chip" type="button" data-example="graduate" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-cap"></use></svg>应届毕业生</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="guide content-width" id="guide" aria-labelledby="guide-title">
+          <h2 id="guide-title">从一段经历，到一个网站</h2>
+          <div class="feature-grid">
+            <article class="feature">
+              <span class="feature-icon"><svg class="icon" aria-hidden="true"><use href="#i-chat"></use></svg></span>
+              <h3>聊聊你的经历</h3>
+              <p>粘贴现有简历，或从姓名、岗位和做过的项目说起。</p>
+            </article>
+            <article class="feature">
+              <span class="feature-icon"><svg class="icon" aria-hidden="true"><use href="#i-window"></use></svg></span>
+              <h3>边聊边预览</h3>
+              <p>在对话里补内容、换主题，同时检查桌面和手机上的效果。</p>
+            </article>
+            <article class="feature">
+              <span class="feature-icon"><svg class="icon" aria-hidden="true"><use href="#i-download"></use></svg></span>
+              <h3>带走你的网页</h3>
+              <p>导出一个 HTML 文件，双击就能打开，也可以部署到自己的域名。</p>
+            </article>
+          </div>
+        </section>
+
+        <footer class="site-footer">
+          <div class="content-width footer-inner">
+            <span class="footer-brand">Folio<span>.</span></span>
+            <p><svg class="icon" aria-hidden="true"><use href="#i-shield"></use></svg>草稿保存在当前浏览器</p>
+          </div>
+        </footer>
+      </div>
+
+      <section class="studio" id="studio" aria-labelledby="studio-title" hidden>
+        <div class="studio-titlebar">
+          <h1 id="studio-title" tabindex="-1">简历工作台</h1>
+          <button class="button button-quiet version-button" id="open-versions" type="button" disabled>
+            <svg class="icon" aria-hidden="true"><use href="#i-history"></use></svg><span>版本历史</span><span class="version-number" id="version-number" hidden></span>
+          </button>
+        </div>
+        <div class="studio-tabs" role="group" aria-label="工作台面板">
+          <button class="button" type="button" data-pane="chat" aria-pressed="true" aria-controls="chat-panel"><svg class="icon" aria-hidden="true"><use href="#i-chat"></use></svg>对话</button>
+          <button class="button" type="button" data-pane="preview" aria-pressed="false" aria-controls="preview-panel"><svg class="icon" aria-hidden="true"><use href="#i-window"></use></svg>网站预览</button>
+        </div>
+        <div class="studio-grid" data-pane="chat" id="studio-grid">
+          <section class="panel chat-panel" id="chat-panel" aria-labelledby="chat-title">
+            <div class="panel-toolbar">
+              <h2 id="chat-title"><svg class="icon" aria-hidden="true"><use href="#i-chat"></use></svg>对话</h2>
+              <button class="button button-quiet edit-link" id="open-editor" type="button" disabled>
+                <svg class="icon" aria-hidden="true"><use href="#i-edit"></use></svg><span>编辑资料</span>
+              </button>
+            </div>
+            <div class="chat-scroll" id="chat-scroll" tabindex="0" aria-label="对话记录">
+              <div class="messages" id="messages" role="log" aria-live="polite" aria-relevant="additions"></div>
+            </div>
+            <div class="chat-bottom">
+              <button class="button button-outline chat-retry" id="retry-chat" type="button" hidden>重试发送</button>
+              <div class="chat-suggestions" id="chat-suggestions" aria-label="快捷修改" hidden>
+                <button class="chip" type="button" id="suggest-theme">换成深色</button>
+                <button class="chip" type="button" id="suggest-contact">补充邮箱</button>
+                <button class="chip" type="button" id="suggest-project">添加项目</button>
+              </div>
+              <form class="composer chat-composer" id="chat-form">
+                <label for="chat-input" class="sr-only">继续描述你的修改</label>
+                <textarea id="chat-input" rows="2" maxlength="20000" placeholder="例如：把主题换成深色，补充一个项目…" spellcheck="false"></textarea>
+                <div class="chat-composer-actions">
+                  <span class="keyboard-hint"><kbd>Enter</kbd> 发送 <span>·</span> <kbd>Shift + Enter</kbd> 换行</span>
+                  <button class="button button-primary icon-button" id="send-chat" type="submit" title="发送" aria-label="发送" disabled><svg class="icon" aria-hidden="true"><use href="#i-send"></use></svg></button>
+                </div>
+              </form>
+            </div>
+          </section>
+
+          <section class="panel preview-panel" id="preview-panel" aria-labelledby="preview-title">
+            <div class="panel-toolbar preview-toolbar">
+              <h2 id="preview-title"><svg class="icon" aria-hidden="true"><use href="#i-window"></use></svg>网站预览</h2>
+              <div class="preview-controls">
+                <label class="theme-control" title="网站主题">
+                  <span class="theme-dot" id="theme-dot" aria-hidden="true"></span>
+                  <select id="select-theme" aria-label="网站主题" disabled>
+                    <option value="paper">纸白</option>
+                    <option value="ink">深林</option>
+                    <option value="blue">暮蓝</option>
+                  </select>
+                </label>
+                <div class="device-controls" role="group" aria-label="预览尺寸">
+                  <button class="button icon-button" id="device-desktop" type="button" title="桌面预览" aria-label="桌面预览" aria-pressed="true"><svg class="icon" aria-hidden="true"><use href="#i-monitor"></use></svg></button>
+                  <button class="button icon-button" id="device-mobile" type="button" title="手机预览" aria-label="手机预览" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-mobile"></use></svg></button>
+                </div>
+                <button class="button icon-button full-button" id="open-preview" type="button" title="全屏预览" aria-label="全屏预览" disabled><svg class="icon" aria-hidden="true"><use href="#i-expand"></use></svg></button>
+              </div>
+            </div>
+            <div class="preview-canvas" id="preview-canvas" data-device="desktop">
+              <div class="build-state" id="build-state" role="status" hidden>
+                <span class="build-icon"><svg class="icon" aria-hidden="true"><use href="#i-spark"></use></svg></span>
+                <b id="build-label">正在整理经历</b>
+                <span id="build-detail">读取个人资料、项目和技能</span>
+                <span class="progress-track" id="build-progress" aria-hidden="true"><span></span></span>
+              </div>
+              <div class="update-indicator" id="update-indicator" role="status" hidden>正在更新预览…</div>
+              <iframe id="resume-preview" title="简历网站预览" sandbox="allow-popups allow-popups-to-escape-sandbox" referrerpolicy="no-referrer" hidden></iframe>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <dialog class="dialog model-dialog" id="model-dialog" aria-labelledby="model-title">
+      <form id="model-form" autocomplete="off">
+        <div class="dialog-heading">
+          <h2 id="model-title">模型设置</h2>
+          <button class="button icon-button close-button" data-close type="button" aria-label="关闭"><svg class="icon" aria-hidden="true"><use href="#i-close"></use></svg></button>
+        </div>
+        <div class="dialog-body edit-fields model-fields">
+          <p class="model-intro">支持 OpenAI 兼容的 Chat Completions 接口。配置后，发送消息会将当前简历和近期对话发给你指定的模型服务。</p>
+          <label>API 地址<input name="baseUrl" type="url" value="https://api.openai.com/v1" required maxlength="2048" spellcheck="false" autocapitalize="off" autofocus></label>
+          <label>API Token<input name="apiToken" type="password" maxlength="4096" autocomplete="off" spellcheck="false" autocapitalize="off" aria-describedby="model-token-hint" placeholder="粘贴服务商提供的 Token"></label>
+          <p class="model-token-hint" id="model-token-hint">Token 保存在本机文件 <code>.folio/model.json</code>。</p>
+          <div class="model-choice">
+            <label for="model-id">模型 ID</label>
+            <div class="model-input-row">
+              <input id="model-id" name="model" value="gpt-4.1-mini" required maxlength="140" spellcheck="false" autocapitalize="off">
+              <button class="button button-outline" id="fetch-models" type="button" disabled>获取模型</button>
+            </div>
+            <div class="model-select-wrap" id="model-select-wrap" hidden>
+              <select id="available-models" aria-label="从列表选择模型"></select>
+            </div>
+          </div>
+          <p class="model-feedback" id="model-feedback" role="status" hidden></p>
+        </div>
+        <div class="dialog-actions">
+          <button class="button button-outline" id="test-model" type="button" title="向已保存的模型发送一条测试消息" disabled>测试连接</button>
+          <button class="button button-primary" id="save-model" type="submit" disabled>保存设置</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="dialog" id="drafts-dialog" aria-labelledby="drafts-title">
+      <div class="dialog-heading">
+        <h2 id="drafts-title">我的草稿</h2>
+        <button class="button icon-button close-button" data-close type="button" aria-label="关闭" autofocus><svg class="icon" aria-hidden="true"><use href="#i-close"></use></svg></button>
+      </div>
+      <div class="dialog-body item-list" id="drafts-list"></div>
+    </dialog>
+
+    <dialog class="dialog" id="versions-dialog" aria-labelledby="versions-title">
+      <div class="dialog-heading">
+        <h2 id="versions-title">版本历史</h2>
+        <button class="button icon-button close-button" data-close type="button" aria-label="关闭" autofocus><svg class="icon" aria-hidden="true"><use href="#i-close"></use></svg></button>
+      </div>
+      <div class="dialog-body item-list" id="versions-list"></div>
+    </dialog>
+
+    <dialog class="dialog edit-dialog" id="edit-dialog" aria-labelledby="edit-title">
+      <form id="profile-form">
+        <div class="dialog-heading">
+          <h2 id="edit-title">编辑资料</h2>
+          <button class="button icon-button close-button" data-close type="button" aria-label="关闭"><svg class="icon" aria-hidden="true"><use href="#i-close"></use></svg></button>
+        </div>
+        <div class="dialog-body edit-fields">
+          <label>姓名<input name="name" maxlength="80" autocomplete="name" autofocus></label>
+          <label>职位<input name="role" maxlength="140"></label>
+          <label>城市<input name="location" maxlength="100" autocomplete="address-level2"></label>
+          <label>邮箱<input name="email" type="email" maxlength="254" autocomplete="email"></label>
+          <label>电话<input name="phone" type="tel" maxlength="50" autocomplete="tel"></label>
+          <label>个人链接<input name="links" maxlength="1500" placeholder="多个链接用逗号分隔"></label>
+          <label class="field-wide">个人简介<textarea name="summary" rows="3" maxlength="5000"></textarea></label>
+          <label class="field-wide">技能<input name="skills" maxlength="1500" placeholder="Figma、用户研究、原型设计"></label>
+          <label class="field-wide">工作经历<textarea name="experience" rows="3" maxlength="12000" placeholder="每行一段经历"></textarea></label>
+          <label class="field-wide">项目<textarea name="projects" rows="3" maxlength="12000" placeholder="每行一个项目"></textarea></label>
+          <label class="field-wide">教育经历<textarea name="education" rows="2" maxlength="8000" placeholder="每行一段经历"></textarea></label>
+        </div>
+        <div class="dialog-actions">
+          <button class="button button-outline" type="button" data-close>取消</button>
+          <button class="button button-primary" type="submit">保存修改</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="dialog full-dialog" id="full-dialog" aria-labelledby="full-title">
+      <div class="dialog-heading">
+        <h2 id="full-title">网站预览</h2>
+        <button class="button icon-button close-button" data-close type="button" aria-label="关闭" autofocus><svg class="icon" aria-hidden="true"><use href="#i-close"></use></svg></button>
+      </div>
+      <iframe id="full-preview" title="全屏简历网站预览" sandbox="allow-popups allow-popups-to-escape-sandbox" referrerpolicy="no-referrer"></iframe>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" hidden></div>
+    <script defer src="./src/resume.js"></script>
+    <script defer src="./src/model.js"></script>
+    <script defer src="./src/app.js"></script>
+  </body>
+</html>
