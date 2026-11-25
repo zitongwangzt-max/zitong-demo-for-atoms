@@ -12,7 +12,9 @@ const FolioModel = (() => {
   const openButtons = [...document.querySelectorAll("[data-model-settings]")];
   const { baseUrl, model, apiToken } = form.elements;
   const ipAddress = /^[0-9]+(?:\.[0-9]+){3}$/.test(location.hostname);
-  const serverOrigin = location.protocol === "http:" && (location.hostname === "localhost" || ipAddress);
+  const securePage = location.protocol === "https:";
+  const serverOrigin = securePage || (location.protocol === "http:" && (location.hostname === "localhost" || ipAddress));
+  if (securePage) document.getElementById("model-token-hint").textContent = "Token 保存在 Folio 服务端。";
   let settings = null;
   let editable = false;
   let busy = false;
@@ -37,26 +39,29 @@ const FolioModel = (() => {
         signal: AbortSignal.timeout(timeout),
       });
     } catch {
-      throw new RequestError("local_network", "连接本地服务失败，请确认 npm run dev 正在运行。");
+      throw new RequestError("local_network", "连接 Folio 服务失败，请检查服务是否正在运行。");
+    }
+    if (method === "GET" && response.status === 404) {
+      throw new RequestError("api_unavailable", "请通过 Folio 服务打开页面以配置模型。");
     }
     if (!response.headers.get("content-type")?.includes("application/json")) {
-      throw new RequestError("api_unavailable", "此页面需要通过 Folio 本地服务打开才能配置模型。");
+      throw new RequestError("api_unavailable", "请通过 Folio 服务打开页面以配置模型。");
     }
     let data;
     try {
       data = await response.json();
     } catch {
-      throw new RequestError("local_response", "本地服务返回了无法读取的内容。");
+      throw new RequestError("local_response", "Folio 服务返回了无法读取的内容。");
     }
     if (!response.ok) {
-      throw new RequestError(data.code, data.message || "本地服务请求失败，请重试。");
+      throw new RequestError(data.code, data.message || "Folio 服务请求失败，请重试。");
     }
     return data;
   }
 
   function setSettings({ baseUrl, model, configured, hasToken }) {
     if (typeof baseUrl !== "string" || typeof model !== "string" || typeof configured !== "boolean" || typeof hasToken !== "boolean") {
-      throw new RequestError("api_unavailable", "此页面需要通过 Folio 本地服务打开才能配置模型。");
+      throw new RequestError("api_unavailable", "请通过 Folio 服务打开页面以配置模型。");
     }
     settings = { baseUrl, model, configured, hasToken };
     for (const button of openButtons) {
@@ -76,12 +81,12 @@ const FolioModel = (() => {
     }
   }
 
-  async function chat(profile, message, history) {
+  async function chat(profile, message, history, options) {
     const latestContext = history.slice(-8).map((item) => ({
       role: item.role,
       content: item.text.slice(0, 2000),
     }));
-    return request("/api/chat", "POST", { profile, message, history: latestContext }, 95000);
+    return request("/api/chat", "POST", { profile, message, history: latestContext, ...options }, 95000);
   }
 
   function showFeedback(text, kind = "info") {
@@ -128,12 +133,12 @@ const FolioModel = (() => {
     if (busy) return;
     busy = true;
     paintControls();
-    showFeedback("正在读取本机配置…");
+    showFeedback("正在读取模型配置…");
     try {
       const config = await loadSettings();
       editable = Boolean(config);
       fillForm(config);
-      if (!config) showFeedback("请通过 npm run dev 或 npm run preview 启动 Folio，再配置模型。", "error");
+      if (!config) showFeedback(securePage ? "请检查 Folio 服务的模型配置接口。" : "请通过 npm run dev 或 npm run preview 启动 Folio，再配置模型。", "error");
       else showFeedback(config.configured ? "已保存模型设置，可以测试连接。" : "未配置模型，当前使用本地整理。");
     } catch (error) {
       editable = error.code === "config_read_error";

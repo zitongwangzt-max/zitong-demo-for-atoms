@@ -9,7 +9,7 @@ const styles = read("src/styles.css").replace("../assets/hero-filaments.webp", d
 const html = read("index.html")
   .replace("./assets/folio-icon.png", dataURL("assets/folio-icon.png", "image/png"))
   .replace('<link rel="stylesheet" href="./src/styles.css">', () => "<style>\n" + styles + "\n</style>")
-  .replace(/<script defer src="\.\/(src\/[^"]+\.js)"><\/script>/g, (_, path) =>
+  .replace(/<script defer src="\.\/(src\/[^"]+\.js|assets\/editor\.js)"><\/script>/g, (_, path) =>
     "<script>\n" + read(path).replace(/<\/script/gi, "<\\/script") + "\n</script>");
 
 mkdirSync(output, { recursive: true });

@@ -2,3 +2,5 @@ dist/
 .DS_Store
 .folio/
 __pycache__/
+node_modules/
+/assets/editor.js

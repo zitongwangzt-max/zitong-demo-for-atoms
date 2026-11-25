@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#101411">
-    <meta name="description" content="用对话整理你的经历，实时预览、修改并导出个人简历网站。">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="description" content="用对话整理你的经历，实时预览、修改并发布个人简历网站。">
     <title>Folio · 简历建站</title>
     <link rel="icon" href="./assets/folio-icon.png" type="image/png">
     <link rel="stylesheet" href="./src/styles.css">
@@ -57,8 +57,11 @@
           <button class="button button-quiet model-button" data-model-settings type="button" aria-label="模型设置" title="模型设置">
             <svg class="icon" aria-hidden="true"><use href="#i-settings"></use></svg><span>模型设置</span>
           </button>
-          <button class="button button-primary export-button" id="export-site" type="button" disabled>
+          <button class="button button-outline export-button" id="export-site" type="button" aria-label="导出 HTML" title="导出 HTML" disabled>
             <svg class="icon" aria-hidden="true"><use href="#i-download"></use></svg><span>导出 HTML</span>
+          </button>
+          <button class="button button-primary publish-button" id="open-publish" type="button" disabled>
+            <svg class="icon" aria-hidden="true"><use href="#i-window"></use></svg>发布
           </button>
         </div>
       </div>
@@ -117,7 +120,7 @@
             <article class="feature">
               <span class="feature-icon"><svg class="icon" aria-hidden="true"><use href="#i-download"></use></svg></span>
               <h3>带走你的网页</h3>
-              <p>导出一个 HTML 文件，双击就能打开，也可以部署到自己的域名。</p>
+              <p>发布简历链接，或下载可独立打开的 HTML 文件。</p>
             </article>
           </div>
         </section>
@@ -156,12 +159,14 @@
               <button class="button button-outline chat-retry" id="retry-chat" type="button" hidden>重试发送</button>
               <div class="chat-suggestions" id="chat-suggestions" aria-label="快捷修改" hidden>
                 <button class="chip" type="button" id="suggest-theme">换成深色</button>
+                <button class="chip" type="button" id="suggest-style">调整样式</button>
+                <button class="chip" type="button" id="suggest-section">新增栏目</button>
                 <button class="chip" type="button" id="suggest-contact">补充邮箱</button>
                 <button class="chip" type="button" id="suggest-project">添加项目</button>
               </div>
               <form class="composer chat-composer" id="chat-form">
                 <label for="chat-input" class="sr-only">继续描述你的修改</label>
-                <textarea id="chat-input" rows="2" maxlength="20000" placeholder="例如：把主题换成深色，补充一个项目…" spellcheck="false"></textarea>
+                <textarea id="chat-input" rows="2" maxlength="20000" placeholder="例如：换成雾霾蓝主题，或新增一个荣誉获奖栏目…" spellcheck="false"></textarea>
                 <div class="chat-composer-actions">
                   <span class="keyboard-hint"><kbd>Enter</kbd> 发送 <span>·</span> <kbd>Shift + Enter</kbd> 换行</span>
                   <button class="button button-primary icon-button" id="send-chat" type="submit" title="发送" aria-label="发送" disabled><svg class="icon" aria-hidden="true"><use href="#i-send"></use></svg></button>
@@ -172,14 +177,23 @@
 
           <section class="panel preview-panel" id="preview-panel" aria-labelledby="preview-title">
             <div class="panel-toolbar preview-toolbar">
-              <h2 id="preview-title"><svg class="icon" aria-hidden="true"><use href="#i-window"></use></svg>网站预览</h2>
-              <div class="preview-controls">
+              <h2 class="sr-only" id="preview-title">简历网站</h2>
+              <div class="output-controls" role="group" aria-label="网站查看方式">
+                <button class="button" type="button" data-output-view="preview" aria-pressed="true" aria-controls="preview-canvas">
+                  <svg class="icon" aria-hidden="true"><use href="#i-window"></use></svg>预览
+                </button>
+                <button class="button" type="button" data-output-view="code" aria-pressed="false" aria-controls="code-canvas">
+                  <svg class="icon" aria-hidden="true"><use href="#i-code"></use></svg>代码
+                </button>
+              </div>
+              <div class="preview-controls" id="preview-controls">
                 <label class="theme-control" title="网站主题">
                   <span class="theme-dot" id="theme-dot" aria-hidden="true"></span>
                   <select id="select-theme" aria-label="网站主题" disabled>
                     <option value="paper">纸白</option>
                     <option value="ink">深林</option>
                     <option value="blue">暮蓝</option>
+                    <option value="custom" disabled>自定义配色</option>
                   </select>
                 </label>
                 <div class="device-controls" role="group" aria-label="预览尺寸">
@@ -197,7 +211,29 @@
                 <span class="progress-track" id="build-progress" aria-hidden="true"><span></span></span>
               </div>
               <div class="update-indicator" id="update-indicator" role="status" hidden>正在更新预览…</div>
-              <iframe id="resume-preview" title="简历网站预览" sandbox="allow-popups allow-popups-to-escape-sandbox" referrerpolicy="no-referrer" hidden></iframe>
+              <iframe id="resume-preview" title="简历网站预览" sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox" referrerpolicy="no-referrer" hidden></iframe>
+            </div>
+            <div class="code-canvas" id="code-canvas" hidden>
+              <div class="code-toolbar">
+                <div class="code-file">
+                  <svg class="icon" aria-hidden="true"><use href="#i-folio"></use></svg>
+                  <span id="code-filename">index.html</span>
+                  <span class="code-status" id="code-status" role="status" hidden>有未应用的修改</span>
+                </div>
+                <div class="code-actions">
+                  <button class="button button-quiet" id="format-code" type="button" hidden>格式化</button>
+                  <button class="button button-quiet" id="discard-code" type="button" hidden>还原</button>
+                  <button class="button button-outline" id="apply-code" type="button" disabled>应用代码</button>
+                  <button class="button button-outline" id="download-code" type="button" disabled>
+                    <svg class="icon" aria-hidden="true"><use href="#i-download"></use></svg>下载 HTML
+                  </button>
+                </div>
+              </div>
+              <div class="code-source" id="code-scroll" hidden>
+                <textarea class="code-fallback" id="html-source" aria-label="HTML 源码" spellcheck="false" autocapitalize="off"></textarea>
+                <div class="html-editor" id="html-editor" hidden></div>
+              </div>
+              <p class="code-empty" id="code-empty" role="status">简历网站生成后，HTML 源码会显示在这里。</p>
             </div>
           </section>
         </div>
@@ -250,6 +286,26 @@
       <div class="dialog-body item-list" id="versions-list"></div>
     </dialog>
 
+    <dialog class="dialog" id="publish-dialog" aria-labelledby="publish-title">
+      <div class="dialog-heading">
+        <h2 id="publish-title">发布简历网站</h2>
+        <button class="button icon-button close-button" data-close type="button" aria-label="关闭"><svg class="icon" aria-hidden="true"><use href="#i-close"></use></svg></button>
+      </div>
+      <div class="dialog-body publish-body">
+        <p id="publish-description">发布当前预览版本。任何持有链接的人都可以打开。</p>
+        <label class="publish-field" id="publish-field" hidden>
+          发布链接
+          <input id="publish-url" type="url" readonly spellcheck="false">
+        </label>
+        <p class="publish-feedback" id="publish-feedback" role="status" hidden></p>
+      </div>
+      <div class="dialog-actions">
+        <button class="button button-primary" id="publish-confirm" type="button" autofocus>发布当前版本</button>
+        <a class="button button-outline" id="open-published" target="_blank" rel="noopener noreferrer" hidden>打开网页</a>
+        <button class="button button-primary" id="copy-published" type="button" hidden>复制链接</button>
+      </div>
+    </dialog>
+
     <dialog class="dialog edit-dialog" id="edit-dialog" aria-labelledby="edit-title">
       <form id="profile-form">
         <div class="dialog-heading">
@@ -265,9 +321,9 @@
           <label>个人链接<input name="links" maxlength="1500" placeholder="多个链接用逗号分隔"></label>
           <label class="field-wide">个人简介<textarea name="summary" rows="3" maxlength="5000"></textarea></label>
           <label class="field-wide">技能<input name="skills" maxlength="1500" placeholder="Figma、用户研究、原型设计"></label>
-          <label class="field-wide">工作经历<textarea name="experience" rows="3" maxlength="12000" placeholder="每行一段经历"></textarea></label>
-          <label class="field-wide">项目<textarea name="projects" rows="3" maxlength="12000" placeholder="每行一个项目"></textarea></label>
-          <label class="field-wide">教育经历<textarea name="education" rows="2" maxlength="8000" placeholder="每行一段经历"></textarea></label>
+          <label class="field-wide">工作经历<textarea name="experience" rows="3" maxlength="12000" placeholder="每段经历另起一行。同一段的补充要点可以缩进。"></textarea></label>
+          <label class="field-wide">项目<textarea name="projects" rows="3" maxlength="12000" placeholder="每个项目另起一行。同一项目的补充要点可以缩进。"></textarea></label>
+          <label class="field-wide">教育经历<textarea name="education" rows="2" maxlength="8000" placeholder="每段经历另起一行。同一段的补充要点可以缩进。"></textarea></label>
         </div>
         <div class="dialog-actions">
           <button class="button button-outline" type="button" data-close>取消</button>
@@ -281,12 +337,14 @@
         <h2 id="full-title">网站预览</h2>
         <button class="button icon-button close-button" data-close type="button" aria-label="关闭" autofocus><svg class="icon" aria-hidden="true"><use href="#i-close"></use></svg></button>
       </div>
-      <iframe id="full-preview" title="全屏简历网站预览" sandbox="allow-popups allow-popups-to-escape-sandbox" referrerpolicy="no-referrer"></iframe>
+      <iframe id="full-preview" title="全屏简历网站预览" sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox" referrerpolicy="no-referrer"></iframe>
     </dialog>
 
     <div class="toast" id="toast" role="status" hidden></div>
     <script defer src="./src/resume.js"></script>
     <script defer src="./src/model.js"></script>
+    <script defer src="./src/avatar.js"></script>
+    <script defer src="./assets/editor.js"></script>
     <script defer src="./src/app.js"></script>
   </body>
 </html>

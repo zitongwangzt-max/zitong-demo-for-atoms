@@ -15,7 +15,9 @@ from urllib.parse import urlsplit
 DEFAULT_URL = "https://api.openai.com/v1"
 DEFAULT_MODEL = "gpt-4.1-mini"
 UPSTREAM_LIMIT = 1024 * 1024
+HTML_LIMIT = 120_000
 SYSTEM_PROMPT_PATH = Path(__file__).resolve().parent.parent / "prompts" / "resume-assistant.md"
+INTAKE_PROMPT_PATH = SYSTEM_PROMPT_PATH.with_name("resume-intake.md")
 
 
 class ModelError(Exception):
@@ -252,33 +254,88 @@ def test_model(config):
     return {"ok": True}
 
 
+def read_resume_prompt(path):
+    try:
+        prompt = path.read_text(encoding="utf-8").strip()
+    except (OSError, UnicodeError) as error:
+        raise ModelError(500, "prompt_read_error", f"读取简历提示词失败，请检查 prompts/{path.name}。") from error
+    if not prompt:
+        raise ModelError(500, "prompt_empty", f"简历提示词为空，请填写 prompts/{path.name}。")
+    return prompt
+
+
+def follow_up_questions(value):
+    if not isinstance(value, list):
+        return []
+    questions = []
+    for item in value:
+        if not isinstance(item, str):
+            continue
+        question = " ".join(item.split())
+        if question and question not in questions:
+            questions.append(question)
+        if len(questions) == 3:
+            break
+    return questions
+
+
 def compose_resume(config, data):
     message = data.get("message")
     profile = data.get("profile")
     history = data.get("history", [])
+    source = data.get("html")
+    source_edited = data.get("sourceEdited", False)
+    correction = data.get("formatCorrection")
+    phase = data.get("phase")
     if not isinstance(message, str) or not message.strip() or len(message) > 20000 or not isinstance(profile, dict) or not isinstance(history, list):
         raise ModelError(400, "invalid_chat", "请检查要发送的简历内容。")
+    if not isinstance(source_edited, bool) or (source_edited and not source):
+        raise ModelError(400, "invalid_chat", "当前 HTML 源码没有随对话发送。")
+    if source is not None and (not isinstance(source, str) or len(source) > HTML_LIMIT or "\x00" in source):
+        raise ModelError(400, "invalid_html", "当前 HTML 无法发送。请检查内容或精简源码后重试。")
+    if correction is not None and (not isinstance(correction, str) or len(correction) > 96 or not re.fullmatch(r"html|patch(?:\.[a-zA-Z]+){0,4}", correction)):
+        raise ModelError(400, "invalid_chat", "修正格式请求无效。")
+    if phase is not None and phase not in ("initial", "revision"):
+        raise ModelError(400, "invalid_chat", "无法识别当前简历的处理阶段。")
+    if phase is None:
+        has_content = source is not None or any(profile.get(key) for key in ("name", "role", "summary", "experience", "projects", "education"))
+        phase = "revision" if has_content else "initial"
     recent = [
         {"role": item["role"], "content": item["content"][:2000]}
         for item in history[-8:]
         if isinstance(item, dict) and item.get("role") in ("user", "assistant") and isinstance(item.get("content"), str)
     ]
-    context = json.dumps({"currentProfile": profile, "recentMessages": recent, "latestRequest": message}, ensure_ascii=False)
-    try:
-        prompt = SYSTEM_PROMPT_PATH.read_text(encoding="utf-8").strip()
-    except (OSError, UnicodeError) as error:
-        raise ModelError(500, "prompt_read_error", "读取简历提示词失败，请检查 prompts/resume-assistant.md。") from error
-    if not prompt:
-        raise ModelError(500, "prompt_empty", "简历提示词为空，请填写 prompts/resume-assistant.md。")
-    text = read_completion(config, [{"role": "system", "content": prompt}, {"role": "user", "content": context}])
+    context = {"phase": phase, "currentProfile": profile, "recentMessages": recent, "latestRequest": message}
+    if source is not None:
+        context.update({"currentHtml": source, "sourceEdited": source_edited})
+    if correction is not None:
+        context["formatCorrection"] = correction
+    prompt = "\n\n".join(read_resume_prompt(path) for path in (SYSTEM_PROMPT_PATH, INTAKE_PROMPT_PATH))
+    text = read_completion(config, [
+        {"role": "system", "content": prompt},
+        {"role": "user", "content": json.dumps(context, ensure_ascii=False)},
+    ])
     text = re.sub(r"^\x60{3}(?:json)?\s*|\s*\x60{3}$", "", text, flags=re.IGNORECASE)
     try:
         result = json.loads(text)
-        reply, patch = result["reply"], result["patch"]
+        if not isinstance(result, dict):
+            raise ValueError("Expected a response object")
+        reply, patch, html = result.get("reply"), result.get("patch"), result.get("html")
+        if html is not None:
+            if not isinstance(html, str) or not html.strip() or len(html) > HTML_LIMIT or "\x00" in html:
+                raise ValueError("Invalid HTML")
+            if patch is None:
+                patch = {}
         if not isinstance(reply, str) or not reply.strip() or not isinstance(patch, dict):
             raise ValueError("Missing reply or patch")
-        if len(config.token) >= 12 and config.token in json.dumps({"reply": reply, "patch": patch}, ensure_ascii=False):
+        output = {"reply": reply.strip(), "patch": patch}
+        questions = follow_up_questions(result.get("questions"))
+        if questions:
+            output["questions"] = questions
+        if html is not None:
+            output["html"] = html.strip()
+        if len(config.token) >= 12 and config.token in json.dumps(output, ensure_ascii=False):
             raise ValueError("Unexpected credential in result")
-        return {"reply": reply.strip(), "patch": patch}
+        return output
     except (ValueError, TypeError, KeyError, RecursionError) as error:
         raise ModelError(502, "invalid_model_output", "模型没有返回可用的简历数据。可以重试，或换一个模型。") from error
